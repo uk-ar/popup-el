@@ -22,13 +22,22 @@
 
 (Setup
  ;; Before anything has run
+ (get-buffer-create "*popup-test*")
+ (get-buffer-create "*dump*")
  )
 
 (Before
+ (switch-to-buffer "*popup-test*")
  ;; Before each scenario is run
  )
 
 (After
+ (switch-to-buffer "*popup-test*")
+ (remove-overlays)
+ (erase-buffer)
+ (switch-to-buffer "*dump*")
+ (remove-overlays)
+ (erase-buffer)
  ;; After each scenario is run
  )
 
