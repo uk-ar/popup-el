@@ -8,26 +8,23 @@
   (set-frame-size (selected-frame) 80 35))
 
 (defun popup-test-helper-buffer-contents ()
-  (with-output-to-string
     (loop with start = (point-min)
+          with contents = nil
           for overlay in (sort* (overlays-in (point-min) (point-max))
                                 '< :key 'overlay-start)
           for overlay-start = (overlay-start overlay)
           for overlay-end = (overlay-end overlay)
-          for prefix = (buffer-substring-no-properties start overlay-start)
+          for prefix = (buffer-substring start overlay-start)
           for befstr = (overlay-get overlay 'before-string)
           for substr = (or (overlay-get overlay 'display)
-                           (buffer-substring-no-properties
-                            overlay-start overlay-end))
+                           (buffer-substring overlay-start overlay-end))
           for aftstr = (overlay-get overlay 'after-string)
-          do (princ prefix)
-          unless (overlay-get overlay 'invisible) do
-          (when befstr (princ befstr))
-          (princ substr)
-          (when aftstr (princ aftstr))
+          collect prefix into contents
+          unless (overlay-get overlay 'invisible) collect
+          (concat befstr substr aftstr) into contents
           do (setq start overlay-end)
-          finally (princ (buffer-substring-no-properties start (point-max))))
-    ))
+          finally (return (concat (apply 'concat contents)
+                                  (buffer-substring start (point-max))))))
 
 (defun popup-test-helper-line-move-visual (arg)
   "This function is workaround. Because `line-move-visual' can not work well in
